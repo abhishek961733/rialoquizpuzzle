@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RialoHQ Quiz Puzzle</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(270deg, #2b2d42, #6c63ff, #1e1f36);
+      background-size: 600% 600%;
+      animation: gradientBG 15s ease infinite;
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
+
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .quiz-container {
+      max-width: 750px;
+      margin: auto;
+      background: rgba(20, 20, 40, 0.85);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0px 0px 25px rgba(0,0,0,0.6);
+      transition: 0.5s;
+    }
+
+    h1 {
+      color: #FFD700;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 10px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .question {
+      margin: 20px 0;
+      font-size: 20px;
+      font-weight: bold;
+      color: #FFD700;
+      transition: all 0.4s ease;
+    }
+
+    .options button {
+      display: block;
+      margin: 12px auto;
+      padding: 14px 22px;
+      width: 85%;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6c63ff, #5146d9);
+      color: #fff;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      box-shadow: 0px 3px 10px rgba(0,0,0,0.3);
+    }
+
+    .options button:hover {
+      background: linear-gradient(135deg, #ff8800, #ff5500);
+      transform: scale(1.05);
+      box-shadow: 0px 0px 15px #ff8800;
+    }
+
+    .score-board {
+      font-size: 22px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #00ffcc;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .next-btn {
+      background: #ff8800;
+      margin-top: 20px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      display: none;
+      transition: all 0.3s;
+    }
+
+    .next-btn:hover {
+      background: #ff5500;
+      transform: scale(1.05);
+      box-shadow: 0px 0px 15px #ff5500;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <!-- Logo replace with your X (Twitter) logo link -->
+    <img src="https://pbs.twimg.com/profile_images/1950265537784926208/qbjSWMDP_400x400.jpg" alt="Rialo Logo" class="logo">
+    <h1>🚀 RialoHQ Quiz Puzzle</h1>
+    <div id="quiz">
+      <p class="question" id="question"></p>
+      <div class="options" id="options"></div>
+      <button class="next-btn" id="nextBtn">Next Question ➡️</button>
+      <div class="score-board" id="score"></div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {question:"What is the core vision of Rialo?",options:["Gaming platform","Meme coin project","Making real-world assets programmable and usable in DeFi","A social media protocol"],answer:2},
+      {question:"How does Rialo bring real-world assets on-chain?",options:["Through digital twins of real assets","Only by using NFTs","By centralized databases","By offline contracts"],answer:0},
+      {question:"Rialo ensures real-world assets become usable by:",options:["Simple digital copies","Smart contracts and compliance layers","AI-generated tokens","Government-only approval"],answer:1},
+      {question:"In the agent economy, Rialo focuses on:",options:["Trading bots only","Making AI agents safe and compliant with assets","Gaming AI","Meme AI projects"],answer:1},
+      {question:"Which is NOT a Rialo focus area?",options:["Real-world assets","AI agents","DeFi integration","Social networking features"],answer:3},
+      {question:"Rialo makes the “agent economy” simple and safe by:",options:["Giving agents smart wallets with policy controls","Replacing AI systems completely","Using only manual approval","Running private servers only"],answer:0},
+      {question:"Rialo helps stablecoin and DeFi ecosystems by:",options:["Allowing real-world assets to be tokenized","Banning stablecoins","Removing compliance features","Only focusing on NFTs"],answer:0},
+      {question:"Rialo introduces programmable assets to:",options:["Enable AI and DeFi applications","Create only gaming tokens","Replace all blockchains","Act as a meme project"],answer:0},
+      {question:"Rialo’s unique edge is:",options:["Fun social media dApps","Focus on real-world assets + AI agent safety","Building meme tokens","Copying other blockchains"],answer:1},
+      {question:"Rialo wants to unlock the future of finance by:",options:["Bridging real-world assets into digital, programmable, safe formats","Creating meme trading platforms","Building NFT-only games","Offering centralized banking apps"],answer:0}
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const scoreEl = document.getElementById("score");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      questionEl.textContent = `Q${currentQuestion+1}. ${q.question}`;
+      optionsEl.innerHTML = "";
+      q.options.forEach((option, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(i, btn);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected, btn) {
+      const q = quizData[currentQuestion];
+      if (selected === q.answer) {
+        score += 10;
+        btn.style.background = "linear-gradient(135deg, #00ff99, #00cc66)";
+        btn.style.boxShadow = "0px 0px 15px #00ff99";
+      } else {
+        btn.style.background = "linear-gradient(135deg, #ff3333, #cc0000)";
+        btn.style.boxShadow = "0px 0px 15px #ff3333";
+      }
+      Array.from(optionsEl.children).forEach(b => b.disabled = true);
+      nextBtn.style.display = "inline-block";
+    }
+
+    nextBtn.addEventListener("click", () => {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+        nextBtn.style.display = "none";
+      } else {
+        endQuiz();
+      }
+    });
+
+    function endQuiz() {
+      questionEl.textContent = "🎉 Quiz Completed!";
+      optionsEl.innerHTML = "";
+      nextBtn.style.display = "none";
+      scoreEl.textContent = `🏆 Your Final Score: ${score} / ${quizData.length * 10}`;
+      scoreEl.style.color = "#FFD700";
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
